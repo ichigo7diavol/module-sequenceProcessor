@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Services.SequenceProcessor.Steps;
 using Services.SequenceProcessor.Steps.Dto;
 
@@ -11,9 +12,11 @@ namespace Services.SequenceProcessor.Editor.Tests
     
     public class ActionTestStep : IParameterizedStep<ActionTestStepDto>
     {
-        public void Execute(ActionTestStepDto dto)
+        public Task Execute(ActionTestStepDto dto)
         {
             dto.TestAction?.Invoke();
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Services.SequenceProcessor.Steps.Dto;
 using Services.SequenceProcessor.Steps.Providers;
 
@@ -23,7 +24,7 @@ namespace Services.SequenceProcessor.Steps.Handlers
                                throw new ArgumentNullException(nameof(provider));
         }
 
-        public void Execute(TDto dto)
+        public async Task Execute(TDto dto)
         {
             if (dto == null)
             {
@@ -31,17 +32,17 @@ namespace Services.SequenceProcessor.Steps.Handlers
             }
             var context = _contextProvider.Get<TContext>();
             
-            _step.Execute(context, dto);
+            await _step.Execute(context, dto);
         }
         
-        public void UnsafeExecute(ISequenceStepDto dto)
+        public async Task UnsafeExecute(ISequenceStepDto dto)
         {
             if (!(dto is TDto concreteDto))
             {
                 throw new InvalidOperationException(
                     $"Wrong Type Of DTO Met {dto.GetType()} But Expected {typeof(TDto)}");
             }
-            Execute(concreteDto);
+            await Execute(concreteDto);
         }
     }
 }

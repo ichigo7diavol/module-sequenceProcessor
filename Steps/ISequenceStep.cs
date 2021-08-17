@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Services.SequenceProcessor.Steps.Dto;
 
 namespace Services.SequenceProcessor.Steps
@@ -8,6 +9,6 @@ namespace Services.SequenceProcessor.Steps
         : ISequenceStep
         where TDto : ISequenceStepDto
     {
-        public void Execute(TDto dto);
+        public Task Execute(TDto dto);
     }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Services.SequenceProcessor.Steps.Dto;
 
 namespace Services.SequenceProcessor.Steps
@@ -7,6 +8,6 @@ namespace Services.SequenceProcessor.Steps
         where TDto : ISequenceStepDto 
         where TContext : IContext
     {
-        public void Execute(TContext context, TDto dto);
+        public Task Execute(TContext context, TDto dto);
     }
 }

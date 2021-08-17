@@ -18,7 +18,7 @@ namespace Services.SequenceProcessor.Providers
         public SequenceStepProvider(List<ISequenceStep> steps, 
             IHandlersFactory handlersFactory)
         {
-            if (steps == null)
+             if (steps == null)
             {
                 throw new ArgumentNullException(nameof(steps));
             }

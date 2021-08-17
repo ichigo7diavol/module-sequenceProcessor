@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using Services.SequenceProcessor.Editor.Tests;
-using Services.SequenceProcessor.Steps;
 using Services.SequenceProcessor.Steps.BasicSteps;
+using Services.SequenceProcessor.Utils;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Zenject;
 
-namespace Services.SequenceProcessor.Editor
+namespace Services.SequenceProcessor.Editor.Tests
 {
     public class SequenceProcessorTest
     {
@@ -69,20 +69,31 @@ namespace Services.SequenceProcessor.Editor
             
             rootStepDto.Steps.Add(actionTestDto1);
             rootStepDto.Steps.Add(actionTestDto2);
-            
+
+            Task task;
+            IEnumerator enumerator;
             try
             {
-                Assert.DoesNotThrow(() => 
-                    _sequenceProcessingService.Process(rootStepDto));
+                task = _sequenceProcessingService.
+                    AwaitableProcess(rootStepDto);
+            
+                enumerator = task.AsIEnumerator(
+                    () => UnityEngine.Object.DestroyImmediate(rootStepDto));
             }
-            finally
+            catch (Exception _)
             {
-                UnityEngine.Object.DestroyImmediate(rootStepDto);
+                if (rootStepDto != null)
+                {
+                    UnityEngine.Object.DestroyImmediate(rootStepDto);
+                }
+                throw;
+            }
+            while (enumerator.MoveNext())
+            {
+                yield return null;
             }
             Assert.AreEqual(afterExecutionValue1, testVariable1);
             Assert.AreEqual(afterExecutionValue2, testVariable2);
-                
-            return null;
         }
     }
 }

@@ -1,7 +1,6 @@
-using Services.SequenceProcessor.Editor.Tests;
 using Zenject;
 
-namespace Services.SequenceProcessor.Editor
+namespace Services.SequenceProcessor.Editor.Tests
 {
     public class TestContext
     {
