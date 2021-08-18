@@ -7,7 +7,7 @@ namespace Services.SequenceProcessor.Utils
 {
     public static class TaskUtils
     {
-        public static IEnumerator AsIEnumerator<T>(this Task<T> task, 
+        public static IEnumerator AsEnumerator<T>(this Task<T> task, 
             Action onError = null)
         {
             while (!task.IsCompleted)
@@ -25,7 +25,7 @@ namespace Services.SequenceProcessor.Utils
             yield return null;
         }
         
-        public static IEnumerator AsIEnumerator(this Task task, 
+        public static IEnumerator AsEnumerator(this Task task, 
             Action onError = null)
         {
             while (!task.IsCompleted)

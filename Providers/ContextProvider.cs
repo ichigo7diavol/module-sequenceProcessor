@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Services.SequenceProcessor.Contexts;
+using Services.SequenceProcessor.Contexts.Constraints;
+using Services.SequenceProcessor.Exceptions;
 using Zenject;
 
 namespace Services.SequenceProcessor.Steps.Providers
@@ -28,7 +29,9 @@ namespace Services.SequenceProcessor.Steps.Providers
         {
             if (!_constraints.All(c => c.IsCanProvideContext<T>()))
             {
-                throw new Exception($"Can't Provide Context {typeof(T)}");
+                var type = typeof(T);
+                
+                throw new CantProvideContextException($"Can't Provide Context {type}", type);
             }
             return _instantiator.Instantiate<T>();
         }
@@ -45,7 +48,7 @@ namespace Services.SequenceProcessor.Steps.Providers
             }
             if (!_constraints.All(c => c.IsCanProvideContext(type)))
             {
-                throw new Exception($"Can't Provide Context {type}");
+                throw new CantProvideContextException($"Can't Provide Context {type}", type);
             }
             return (IContext)_instantiator.Instantiate(type);
         }

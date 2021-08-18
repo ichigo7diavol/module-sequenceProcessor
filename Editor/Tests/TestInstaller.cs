@@ -9,6 +9,14 @@ namespace Services.SequenceProcessor.Editor.Tests
             Container.
                 BindInterfacesAndSelfTo<ActionTestStep>().
                 AsSingle();
+            
+            Container.
+                BindInterfacesAndSelfTo<ActionContextualTestStep>().
+                AsSingle();
+            
+            Container.
+                BindInterfacesAndSelfTo<TestConstraint>().
+                AsSingle();
         }
     }
 }

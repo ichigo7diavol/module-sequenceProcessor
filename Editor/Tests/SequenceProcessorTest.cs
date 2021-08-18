@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Services.SequenceProcessor.Exceptions;
 using Services.SequenceProcessor.Steps.BasicSteps;
 using Services.SequenceProcessor.Utils;
 using UnityEngine;
@@ -12,13 +14,13 @@ namespace Services.SequenceProcessor.Editor.Tests
 {
     public class SequenceProcessorTest
     {
-        private TestContext _context;
+        private TestingContext _context;
         private ISequenceProcessingService _sequenceProcessingService;
         
         
-        private TestContext CreateContext()
+        private TestingContext CreateContext()
         {
-            return new TestContext();
+            return new TestingContext();
         }
 
         private void ResolveBindings(DiContainer container)
@@ -77,7 +79,7 @@ namespace Services.SequenceProcessor.Editor.Tests
                 task = _sequenceProcessingService.
                     AwaitableProcess(rootStepDto);
             
-                enumerator = task.AsIEnumerator(
+                enumerator = task.AsEnumerator(
                     () => UnityEngine.Object.DestroyImmediate(rootStepDto));
             }
             catch (Exception _)
@@ -94,6 +96,76 @@ namespace Services.SequenceProcessor.Editor.Tests
             }
             Assert.AreEqual(afterExecutionValue1, testVariable1);
             Assert.AreEqual(afterExecutionValue2, testVariable2);
+        }
+
+        [UnityTest]
+        public IEnumerator ContextualSequenceStepTest()
+        {
+            Task task;
+            IEnumerator enumerator = null;
+
+            bool isComplete = false;
+            
+            try
+            {
+                task = _sequenceProcessingService.
+                    AwaitableProcess(new ActionContextualTestStepDto());
+            
+                enumerator = task.AsEnumerator();
+            }
+            catch (Exception _)
+            {
+                var exception = _;
+
+                if (_ is AggregateException aggregateException)
+                {
+                    var flatten = aggregateException.Flatten();
+
+                    exception = flatten.InnerExceptions.
+                        FirstOrDefault(e => e is CantProvideContextException);
+                }
+                if (exception == null)
+                {
+                    Assert.Fail($"Must Throw Exception Of Type {nameof(CantProvideContextException)}");
+                }
+                isComplete = true;
+            }
+            if (!isComplete)
+            {
+                do
+                {
+                    try
+                    {
+                        if (!enumerator.MoveNext())
+                        {
+                            break;
+                        }
+                    }
+                    catch (Exception _)
+                    {
+                        var exception = _;
+
+                        if (_ is AggregateException aggregateException)
+                        {
+                            var flatten = aggregateException.Flatten();
+
+                            exception = flatten.InnerExceptions.
+                                FirstOrDefault(e => e is CantProvideContextException);
+                        }
+                        if (exception == null)
+                        {
+                            Assert.Fail($"Must Throw Exception Of Type {nameof(CantProvideContextException)}");
+                        }
+                        isComplete = true;
+                    }
+                    yield return null;
+                } 
+                while (true);
+            }
+            if (!isComplete)
+            {
+                Assert.Fail($"Must Throw Exception Of Type {nameof(CantProvideContextException)}");
+            }
         }
     }
 }
